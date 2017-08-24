@@ -2,9 +2,9 @@ import sys
 import numpy as np
 import math
 
-# input: numpy array
-def getMotorValues(desiredVector):
-	if desiredVector.size == 0:
+# input: numpy array, -1 to 1 value
+def getMotorValues(desiredVector, rotationStrength):
+	if desiredVector.size == 0 and rotationStrength == 0:
 		return (0, 0, 0, 0)
 
 	desiredX = desiredVector.tolist()[0]
@@ -12,6 +12,8 @@ def getMotorValues(desiredVector):
 	desiredMagnitude = abs(desiredX)
 	if abs(desiredY) > desiredMagnitude:
 		desiredMagnitude = abs(desiredY)
+	if abs(rotationStrength) > desiredMagnitude:
+		desiredMagnitude = abs(rotationStrength)
 
 	if desiredMagnitude == 0:
 		return (0, 0, 0, 0)
@@ -21,18 +23,42 @@ def getMotorValues(desiredVector):
 	c, s = np.cos(offset), np.sin(offset)
 	rotationMatrix = np.matrix('{} {}; {} {}'.format(c, -s, s, c))
 
-	# create motorVector from rotation matrix and desiredVector
+	# create output vector from rotation matrix and desiredVector
 	ouput = desiredVector.dot(rotationMatrix).tolist()[0]
-
-	# scale output to match desired magnitude
 	outputX = ouput[0]
 	outputY = ouput[1]
-	outputMagnitude = abs(outputX)
-	if abs(outputY) > outputMagnitude:
-		outputMagnitude = abs(outputY)
 
+	# define motors
+	frontLeft = outputX
+	frontRight = outputY
+	backLeft = outputY
+	backRight = outputX
+
+	#manipulate values based on rotation from rotationStrength
+	rotationStrength = rotationStrength * 2
+	frontLeft = frontLeft + rotationStrength
+	frontRight = frontRight - rotationStrength
+	backLeft = backLeft + rotationStrength
+	backRight = backRight - rotationStrength
+
+	# get output magnitude
+	outputMagnitude = abs(frontRight)
+	if abs(frontLeft) > outputMagnitude:
+		outputMagnitude = abs(frontLeft)
+	if abs(backLeft) > outputMagnitude:
+		outputMagnitude = abs(backLeft)
+	if abs(backRight) > outputMagnitude:
+		outputMagnitude = abs(backRight)
+
+	# scale output to match desired magnitude
 	scale = desiredMagnitude / outputMagnitude
-	scaledOutput = (outputX * scale, outputY * scale)
 
-	return (scaledOutput[1], scaledOutput[0], scaledOutput[1], scaledOutput[0])
+	frontLeft = frontLeft * scale
+	frontRight = frontRight * scale
+	backLeft = backLeft * scale
+	backRight = backRight * scale
+
+	scaledOutput = (frontRight, frontLeft, backLeft, backRight)
+
+	return scaledOutput
 

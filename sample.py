@@ -22,7 +22,8 @@ def navigate():
 	mode = 0
 
 	leftStick = controller.leftStick()
-	motorValues = helper.getMotorValues(np.array(leftStick))
+	rightStickX = controller.rightStick()[0]
+	motorValues = helper.getMotorValues(np.array(leftStick), rightStickX)
 	data = [1, int(abs(motorValues[0]) * 100), int(motorValues[0] < 0), 10]
 	data.extend([2, int(abs(motorValues[1]) * 100), int(motorValues[1] < 0), 10])
 	data.extend([3, int(abs(motorValues[2]) * 100), int(motorValues[2] < 0), 10])
@@ -81,7 +82,7 @@ while not controller.Back():
 		controlRobot()
 		sys.stdout.write("\rController connected, Mode: " + modeToString())
 	else:
-		sys.stdout.write("\rController disconnected")
+		sys.stdout.write("\rController disconnected                         ")
 
 	sleep(0.050)
 	sys.stdout.flush()
