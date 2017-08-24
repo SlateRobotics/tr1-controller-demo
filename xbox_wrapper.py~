@@ -1,0 +1,32 @@
+import sys
+import xbox
+
+CONTROLLER_MODE_NAVIGATE = 0
+CONTROLLER_MODE_MANIPULATE = 1
+
+class Controller:
+	joystick
+	_mode = CONTROLLER_MODE_NAVIGATE
+
+	def __init__(self):
+		try:
+			self.joystick = xbox.Joystick()
+		except:
+			__init__()
+
+	def getControllerMode(joystick, mode):
+		if joystick.A():
+		    return CONTROLLER_MODE_NAVIGATE
+		elif joystick.B():
+		    return CONTROLLER_MODE_MANIPULATE
+		else:
+			return mode
+
+	def getJoystick(i=0):
+		try:
+			return xbox.Joystick()
+		except:
+			i = i + 1
+			sys.stdout.write("\nError setting up to joystick. Retrying... (Retry #" + str(i) +")\n")
+			sleep(1)
+			return getJoystick(i + 1);
