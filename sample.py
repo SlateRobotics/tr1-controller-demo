@@ -1,3 +1,4 @@
+#!/usr/bin/python 
 import sys
 import i2c_wrapper
 import xbox_controller
