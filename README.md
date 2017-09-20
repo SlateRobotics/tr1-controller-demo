@@ -11,6 +11,6 @@ The program is installed as an upstart service that is located at `/etc/init/con
 ```bash
 start on runlevel [2345]
 stop on runlevel [!2345]
-# exec /home/ubuntu/Documents/Github/tr1-controller-demo/sample.py
+# exec /home/ubuntu/Documents/GitHub/tr1-controller-demo/sample.py
 ```
 You may also stop the service at any time by entering `/etc/init/controller-demo.conf stop` and start the service by entering `/etc/init/controller-demo.conf start`.
