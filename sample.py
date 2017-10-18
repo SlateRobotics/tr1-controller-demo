@@ -10,6 +10,9 @@ sys.stdout.write("Program starting up...")
 
 ADDRESS_BASE_MOTORS = 0x70
 ADDRESS_TORSO_ACTUATOR = 0x71
+ADDRESS_ARM_RIGHT_1 = 0x72
+ADDRESS_ARM_RIGHT_2 = 0x73
+ADDRESS_HEAD = 0x74
 
 MODE_NAVIGATE = 0
 MODE_MANIPULATE = 1
@@ -33,9 +36,25 @@ def navigate():
 	i2c.sendBlockData(address, mode, data)
 
 def manipulate():
-	address = 0x00
+	address = ADDRESS_ARM_RIGHT_1
 	mode = 0
 	data = []
+	
+	leftStick = controller.leftStick()
+	rightStick = controller.rightStick()
+
+        if (abs(leftStick[0]) > 0.25):
+                data.extend([1, abs(int(leftStick[0] * 100)), int(leftStick[0] < 0), 10])
+
+	if (abs(leftStick[1]) > 0.25):
+		data.extend([2, abs(int(leftStick[1] * 100)), int(leftStick[1] < 0), 10])
+
+        if (abs(rightStick[0]) > 0.25):
+                data.extend([3, abs(int(rightStick[0] * 100)), int(rightStick[0] < 0), 10])
+
+	if (abs(rightStick[1]) > 0.25):
+		data.extend([4, abs(int(rightStick[1] * 100)), int(rightStick[1] < 0), 10])
+
 	i2c.sendBlockData(address, mode, data)
 
 def actuateTorso():
@@ -50,6 +69,18 @@ def actuateTorso():
 	
 	i2c.sendBlockData(address, mode, data)
 
+def actuateHead():
+	address = ADDRESS_HEAD
+	mode = 0
+	data = []
+
+	if controller.dpadUp():
+		data = [100, 1, 10]
+	elif controller.dpadDown():
+		data = [100, 0, 10]
+
+	i2c.sendBlockData(address, mode, data)
+
 def controlRobot():
 	global mode
 	if mode == MODE_NAVIGATE:
@@ -58,6 +89,7 @@ def controlRobot():
 		manipulate()
 
 	actuateTorso()
+	actuateHead()
 
 def setMode():
 	global mode
