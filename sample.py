@@ -50,10 +50,10 @@ def manipulate():
 		data.extend([2, abs(int(leftStick[1] * 100)), int(leftStick[1] < 0), 10])
 
         if (abs(rightStick[0]) > 0.25):
-                data.extend([3, abs(int(rightStick[0] * 100)), int(rightStick[0] < 0), 10])
+                data.extend([4, abs(int(rightStick[0] * 100)), int(rightStick[0] < 0), 10])
 
 	if (abs(rightStick[1]) > 0.25):
-		data.extend([4, abs(int(rightStick[1] * 100)), int(rightStick[1] < 0), 10])
+		data.extend([3, abs(int(rightStick[1] * 100)), int(rightStick[1] > 0), 10])
 
 	i2c.sendBlockData(address, mode, data)
 
