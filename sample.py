@@ -28,17 +28,22 @@ def navigate():
 	leftStick = controller.leftStick()
 	rightStickX = controller.rightStick()[0]
 	motorValues = helper.getMotorValues(np.array(leftStick), rightStickX)
-	data = [1, int(abs(motorValues[0]) * 100), int(motorValues[0] < 0), 10]
-	data.extend([2, int(abs(motorValues[1]) * 100), int(motorValues[1] < 0), 10])
-	data.extend([3, int(abs(motorValues[2]) * 100), int(motorValues[2] < 0), 10])
-	data.extend([4, int(abs(motorValues[3]) * 100), int(motorValues[3] < 0), 10])
+	
+	total = abs(motorValues[0]) + abs(motorValues[1]) + abs(motorValues[2]) + abs(motorValues[3])
+	if (total > 0):
+		data = [1, int(abs(motorValues[0]) * 100), int(motorValues[0] < 0), 10]
+		data.extend([2, int(abs(motorValues[1]) * 100), int(motorValues[1] < 0), 10])
+		data.extend([3, int(abs(motorValues[2]) * 100), int(motorValues[2] < 0), 10])
+		data.extend([4, int(abs(motorValues[3]) * 100), int(motorValues[3] < 0), 10])
 
-	i2c.sendBlockData(address, mode, data)
+		i2c.sendBlockData(address, mode, data)
 
 def manipulate():
 	address = ADDRESS_ARM_RIGHT_1
+	address2 = ADDRESS_ARM_RIGHT_2
 	mode = 0
 	data = []
+	data2 = []
 	
 	leftStick = controller.leftStick()
 	rightStick = controller.rightStick()
@@ -55,7 +60,18 @@ def manipulate():
 	if (abs(rightStick[1]) > 0.25):
 		data.extend([3, abs(int(rightStick[1] * 100)), int(rightStick[1] > 0), 10])
 
+	if (controller.dpadLeft()):
+		data2.extend([1, 100, 0, 10])
+	elif (controller.dpadRight()):
+		data2.extend([1, 100, 1, 10])
+
+	if (controller.dpadUp()):
+		data2.extend([2, 100, 0, 10])
+	elif (controller.dpadDown()):
+		data2.extend([2, 100, 1, 10])
+
 	i2c.sendBlockData(address, mode, data)
+	i2c.sendBlockData(address2, mode, data2)
 
 def actuateTorso():
 	address = ADDRESS_TORSO_ACTUATOR
@@ -87,9 +103,10 @@ def controlRobot():
 		navigate()
 	elif mode == MODE_MANIPULATE:
 		manipulate()
+	elif mode == MODE_HEAD:
+		actuateHead()
 
 	actuateTorso()
-	actuateHead()
 
 def setMode():
 	global mode
